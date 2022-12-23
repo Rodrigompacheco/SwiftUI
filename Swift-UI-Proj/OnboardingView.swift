@@ -10,6 +10,7 @@ import SwiftUI
 struct OnboardingView: View {
     
     // MARK: PROPERTY
+    @AppStorage("onboarding") var isOnboardingViewActive: Bool = false
     @State private var buttonWidth: Double = UIScreen.main.bounds.width - 80
     @State private var buttonOffset: CGFloat = 0
     @State private var isAnimating: Bool = false
@@ -26,14 +27,22 @@ struct OnboardingView: View {
                     .fontWeight(.heavy)
                     .fontDesign(.rounded)
                     .foregroundColor(.white)
+                    .opacity(isAnimating ? 1 : 0)
+                    .offset(y: isAnimating ? 0 : -80)
+                    .animation(.easeOut(duration: 1), value: isAnimating)
          
                 // MARK: - CENTER
                 ZStack {
-                    CircleGroupView(color: .white, shapeOpacity: 0.2)
+                    CircleGroupView(color: .white,
+                                    shapeOpacity: 0.2,
+                                    withAnimation: true)
                     
                     Image("character-1")
                         .resizable()
                         .scaledToFit()
+                        .opacity(isAnimating ? 1 : 0)
+                        .offset(x: isAnimating ? 0 : 300)
+                        .animation(.easeOut(duration: 1), value: isAnimating)
                 }
                
                 // MARK: - FOOTER
@@ -81,8 +90,12 @@ struct OnboardingView: View {
                                     }
                                 })
                                 .onEnded({ gesture in
-                                    if gesture.translation.width < buttonWidth - 80 {
-                                        buttonOffset = 0
+                                    withAnimation(Animation.easeOut(duration: 5)) {
+                                        if gesture.translation.width < buttonWidth - 80 {
+                                            buttonOffset = 0
+                                        } else {
+                                            isOnboardingViewActive = false
+                                        }
                                     }
                                 })
                         )
@@ -92,6 +105,9 @@ struct OnboardingView: View {
                 }
                 .frame(width: buttonWidth, height: 80, alignment: .center)
                 .padding()
+                .opacity(isAnimating ? 1 : 0)
+                .offset(y: isAnimating ? 0 : 40)
+                .animation(.easeOut(duration: 1), value: isAnimating)
             }
             .padding(.top, 60)
         }
